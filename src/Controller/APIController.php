@@ -61,9 +61,13 @@ class APIController extends AbstractController
         $repository = $this->getEntityRepo("App\\Entity\\" . ucfirst($entity));
         if(!$repository)
             throw $this->createNotFoundException('The entity does not exist');
+        $data = $request->query->all();
 
         // Read Process
-        $entities = $repository->findAll();
+        if(!empty($data))
+            $entities = $repository->findBy($data);
+        else
+            $entities = $repository->findAll();
         $formatted_entities = [];
         foreach($entities as $entity) {
             $formatted_entities[] = $entity->toArray();

@@ -76,6 +76,7 @@ class ReservationRepository extends ServiceEntityRepository
      * @param Reservation $reservation
      * @param bool $update
      * @return array
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function validate(Reservation $reservation, bool $update = false) {
         $errors = [];
