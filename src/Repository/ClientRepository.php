@@ -69,10 +69,12 @@ class ClientRepository extends ServiceEntityRepository
 
         // Verification email
         $email = $client->getEmail();
-        if(!$email && !is_int($email)) {
-            $errors['email'] = "L'email du client est obligatoire'";
+        if(!$email) {
+            $errors['email'] = "L'email du client est obligatoire";
         }
-        // Contrainte d'unicité de l'email
+        elseif($this->sameEmailExists($email)) {
+            $errors['email'] = "L'email du client est déjà utilisé";
+        }
 
         return $errors;
     }
@@ -101,6 +103,27 @@ class ClientRepository extends ServiceEntityRepository
 
         $this->getEntityManager()->remove($client);
         $this->getEntityManager()->flush();
+    }
+
+    /**
+     * Check if the same email already exists in database
+     *
+     * @param string $email
+     * @return bool
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function sameEmailExists(string $email) {
+        $conn = $this->getEntityManager()
+            ->getConnection();
+
+        $sql = "SELECT COUNT(id) FROM client WHERE email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(1, trim($email));
+        $stmt->execute();
+
+        // Vérification de l'existence d'un email similaire
+        $numberEmail = intval($stmt->fetchColumn());
+        return $numberEmail > 0;
     }
 
 
