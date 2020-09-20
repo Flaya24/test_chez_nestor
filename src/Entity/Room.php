@@ -38,10 +38,10 @@ class Room
      * @ORM\ManyToOne(targetEntity=Apartment::class, inversedBy="rooms")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $apartment_id;
+    private $apartment;
 
     /**
-     * @ORM\OneToMany(targetEntity=Reservation::class, mappedBy="room_id", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Reservation::class, mappedBy="room", orphanRemoval=true)
      */
     private $reservations;
 
@@ -91,14 +91,14 @@ class Room
         return $this;
     }
 
-    public function getApartmentId(): ?Apartment
+    public function getApartment(): ?Apartment
     {
-        return $this->apartment_id;
+        return $this->apartment;
     }
 
-    public function setApartmentId(Apartment $apartment_id): self
+    public function setApartment(Apartment $apartment): self
     {
-        $this->apartment_id = $apartment_id;
+        $this->apartment = $apartment;
 
         return $this;
     }
@@ -115,7 +115,7 @@ class Room
     {
         if (!$this->reservations->contains($reservation)) {
             $this->reservations[] = $reservation;
-            $reservation->setRoomId($this);
+            $reservation->setRoom($this);
         }
 
         return $this;
@@ -126,8 +126,8 @@ class Room
         if ($this->reservations->contains($reservation)) {
             $this->reservations->removeElement($reservation);
             // set the owning side to null (unless already changed)
-            if ($reservation->getRoomId() === $this) {
-                $reservation->setRoomId(null);
+            if ($reservation->getRoom() === $this) {
+                $reservation->setRoom(null);
             }
         }
 
@@ -141,7 +141,7 @@ class Room
             'number' => $this->getNumber(),
             'area' => $this->getArea(),
             'price' => $this->getPrice(),
-            'apartment_id' => $this->getApartmentId()->getId()
+            'apartment_id' => $this->getApartment()->getId()
         ];
     }
 }

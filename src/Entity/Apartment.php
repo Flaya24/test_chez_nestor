@@ -40,7 +40,7 @@ class Apartment
     private $city;
 
     /**
-     * @ORM\OneToMany(targetEntity=Room::class, mappedBy="apartment_id", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Room::class, mappedBy="apartment", orphanRemoval=true)
      */
     private $rooms;
 
@@ -114,7 +114,7 @@ class Apartment
     {
         if (!$this->rooms->contains($room)) {
             $this->rooms[] = $room;
-            $room->setApartmentId($this);
+            $room->setApartment($this);
         }
 
         return $this;
@@ -125,8 +125,8 @@ class Apartment
         if ($this->rooms->contains($room)) {
             $this->rooms->removeElement($room);
             // set the owning side to null (unless already changed)
-            if ($room->getApartmentId() === $this) {
-                $room->setApartmentId(null);
+            if ($room->getApartment() === $this) {
+                $room->setApartment(null);
             }
         }
 

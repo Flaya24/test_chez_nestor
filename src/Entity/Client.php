@@ -50,7 +50,7 @@ class Client
     private $nationality;
 
     /**
-     * @ORM\OneToMany(targetEntity=Reservation::class, mappedBy="client_id", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Reservation::class, mappedBy="client", orphanRemoval=true)
      */
     private $reservations;
 
@@ -148,7 +148,7 @@ class Client
     {
         if (!$this->reservations->contains($reservation)) {
             $this->reservations[] = $reservation;
-            $reservation->setClientId($this);
+            $reservation->setClient($this);
         }
 
         return $this;
@@ -159,8 +159,8 @@ class Client
         if ($this->reservations->contains($reservation)) {
             $this->reservations->removeElement($reservation);
             // set the owning side to null (unless already changed)
-            if ($reservation->getClientId() === $this) {
-                $reservation->setClientId(null);
+            if ($reservation->getClient() === $this) {
+                $reservation->setClient(null);
             }
         }
 
@@ -175,8 +175,20 @@ class Client
             'lastName' => $this->getLastName(),
             'email' => $this->getEmail(),
             'phone' => $this->getPhone(),
-            'birthDate' => $this->getBirthDate(),
+            'birthDate' => $this->getBirthDate() ? $this->getBirthDate()->format('d/m/Y') : null,
             'nationality' => $this->getNationality(),
         ];
+    }
+
+    public function getMissingInformationForReservation() : array {
+        $missingInformations = [];
+        $clientArray = $this->toArray();
+
+        foreach($clientArray as $clientInfoKey => $clientInfo) {
+            if(!$clientInfo)
+                $missingInformations[] = $clientInfoKey;
+        }
+
+        return $missingInformations;
     }
 }

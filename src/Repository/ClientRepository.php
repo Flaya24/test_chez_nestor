@@ -25,8 +25,11 @@ class ClientRepository extends ServiceEntityRepository
             $client->setEmail($data['email']);
         if(isset($data['phone']))
             $client->setPhone($data['phone']);
-        if(isset($data['birthDate']))
-            $client->setBirthDate($data['birthDate']);
+        if(isset($data['birthDate'])) {
+            $birthDate = date_create_from_format('d/m/Y', $data['birthDate']);
+            if($birthDate)
+                $client->setBirthDate($birthDate);
+        }
         if(isset($data['nationality']))
             $client->setNationality($data['nationality']);
     }
@@ -69,11 +72,12 @@ class ClientRepository extends ServiceEntityRepository
 
         // Verification email
         $email = $client->getEmail();
-        if(!$email) {
-            $errors['email'] = "L'email du client est obligatoire";
-        }
-        elseif($this->sameEmailExists($email)) {
-            $errors['email'] = "L'email du client est déjà utilisé";
+        if(!$update) {
+            if (!$email) {
+                $errors['email'] = "L'email du client est obligatoire";
+            } elseif ($this->sameEmailExists($email)) {
+                $errors['email'] = "L'email du client est déjà utilisé";
+            }
         }
 
         return $errors;

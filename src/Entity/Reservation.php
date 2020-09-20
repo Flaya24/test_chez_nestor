@@ -21,13 +21,13 @@ class Reservation
      * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="reservations")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $client_id;
+    private $client;
 
     /**
      * @ORM\ManyToOne(targetEntity=Room::class, inversedBy="reservations")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $room_id;
+    private $room;
 
     /**
      * @ORM\Column(type="date")
@@ -44,26 +44,26 @@ class Reservation
         return $this->id;
     }
 
-    public function getClientId(): ?Client
+    public function getClient(): ?Client
     {
-        return $this->client_id;
+        return $this->client;
     }
 
-    public function setClientId(?Client $client_id): self
+    public function setClient(?Client $client): self
     {
-        $this->client_id = $client_id;
+        $this->client = $client;
 
         return $this;
     }
 
-    public function getRoomId(): ?Room
+    public function getRoom(): ?Room
     {
-        return $this->room_id;
+        return $this->room;
     }
 
-    public function setRoomId(?Room $room_id): self
+    public function setRoom(?Room $room): self
     {
-        $this->room_id = $room_id;
+        $this->room = $room;
 
         return $this;
     }
@@ -96,10 +96,10 @@ class Reservation
     {
         return [
             'id' => $this->getId(),
-            'client_id' => $this->getClientId(),
-            'room_id' => $this->getRoomId(),
-            'startDate' => $this->getStartDate(),
-            'endDate' => $this->getEndDate()
+            'clientId' => $this->getClient()->getId(),
+            'roomId' => $this->getRoom()->getId(),
+            'startDate' => $this->getStartDate() ? $this->getStartDate()->format('d/m/Y') : null,
+            'endDate' => $this->getEndDate() ? $this->getEndDate()->format('d/m/Y') : null
         ];
     }
 }

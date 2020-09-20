@@ -29,7 +29,7 @@ class RoomRepository extends ServiceEntityRepository
             $apartmentRepo = $this->getEntityManager()->getRepository(Apartment::class);
             $apartment = $apartmentRepo->findOneBy([ 'id' => $data['apartment_id'] ]);
             if(is_object($apartment))
-                $room->setApartmentId($apartment);
+                $room->setApartment($apartment);
         }
     }
 
@@ -96,7 +96,7 @@ class RoomRepository extends ServiceEntityRepository
      */
     public function save(Room $room) {
         // Verification contrainte Appartment
-        $apartment = $room->getApartmentId();
+        $apartment = $room->getApartment();
         if(!$apartment && !is_object($apartment))
             throw new \Exception("L'identifiant Appartement lié à la chambre est invalide");
 
@@ -116,7 +116,7 @@ class RoomRepository extends ServiceEntityRepository
 
         // Vérification de l'appartement (doit toujours posséder au moins une chambre)
         $apartmentRepo = $this->getEntityManager()->getRepository(Apartment::class);
-        $apartment = $apartmentRepo->findOneBy([ 'id' => $room->getApartmentId() ]);
+        $apartment = $apartmentRepo->findOneBy([ 'id' => $room->getApartment() ]);
         if($apartment->getRooms()->count() <= 1)
             throw new \Exception("La chambre ne peut être supprimée car l'appartement doit posséder au moins une chambre");
 
