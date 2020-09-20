@@ -96,7 +96,7 @@ class Room
         return $this->apartment_id;
     }
 
-    public function setApartmentId(int $apartment_id): self
+    public function setApartmentId(Apartment $apartment_id): self
     {
         $this->apartment_id = $apartment_id;
 

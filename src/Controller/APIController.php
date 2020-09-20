@@ -33,7 +33,10 @@ class APIController extends AbstractController
             if(empty($errors)) {
                 $repository->save($new_entity);
 
-                return new JsonResponse(['new_item' => $new_entity->toArray() ]);
+                if(is_array($new_entity))
+                    return new JsonResponse(['new_item' => array_map(function($entity) { return $entity->toArray(); }, $new_entity) ]);
+                else
+                    return new JsonResponse(['new_item' => $new_entity->toArray() ]);
             }
             else {
                 return new JsonResponse(['errors' => $errors ], 400);
@@ -86,13 +89,20 @@ class APIController extends AbstractController
 
         // Update Process
         try {
+            $entity_to_update = $repository->findOneBy([ 'id' => $id ]);
+            if(!is_object($entity_to_update))
+                throw $this->createNotFoundException('The entity does not exist');
+
             $updated_entity = $repository->update($id, $data);
             $errors = $repository->validate($updated_entity, true);
 
             if(empty($errors)) {
                 $repository->save($updated_entity);
 
-                return new JsonResponse(['updated_item' => $updated_entity->toArray() ]);
+                if(is_array($updated_entity))
+                    return new JsonResponse(['updated_item' => array_map(function($entity) { return $entity->toArray(); }, $updated_entity) ]);
+                else
+                    return new JsonResponse(['updated_item' => $updated_entity->toArray() ]);
             }
             else {
                 return new JsonResponse(['errors' => $errors ], 400);
@@ -109,6 +119,7 @@ class APIController extends AbstractController
      *
      * @param Request $request
      * @param string $entity
+     * @param int $id
      * @return JsonResponse
      */
     public function apiDelete(Request $request, string $entity, int $id) : JsonResponse {
@@ -119,12 +130,16 @@ class APIController extends AbstractController
 
         // Requête
         try {
-            $repository->remove($data);
+            $entity_to_delete = $repository->findOneBy([ 'id' => $id ]);
+            if(!is_object($entity_to_delete))
+                throw $this->createNotFoundException('The entity does not exist');
+
+            $repository->remove($id);
 
             return new JsonResponse([]);
         }
         catch(\Exception $ex) {
-            return new JsonResponse(['message' => $ex->getMessage(), 500 ]);
+            return new JsonResponse(['message' => $ex->getMessage()],  500);
         }
 
     }
